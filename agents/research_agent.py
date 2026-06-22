@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from tavily import TavilyClient
+from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
 
@@ -19,3 +20,21 @@ def research_topic(topic: str):
     )
 
     return results["results"]
+
+def research_subtasks(subtasks):
+    all_results = []
+
+    def process_task(task):
+        print(f"\n🔍 Researching: {task}")
+
+        results = research_topic(task)
+
+        return {
+            "subtask": task,
+            "sources": results
+        }
+
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        all_results = list(executor.map(process_task, subtasks))
+
+    return all_results

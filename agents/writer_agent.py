@@ -1,49 +1,40 @@
-import os
-from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from utils.llm import llm
 
-load_dotenv()
+def write_report(topic, analyses):
+    sections = ""
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=os.getenv("GEMINI_API_KEY")
-)
+    for item in analyses:
+        sections += f"""
+Subtask:
+{item['subtask']}
 
-
-def write_report(topic, research_results):
-    """
-    Generate a structured report from research findings.
-    """
-
-    research_text = ""
-
-    for result in research_results:
-        research_text += f"""
-Title: {result['title']}
-Content: {result['content']}
+Insights:
+{item['analysis']}
 
 """
 
     prompt = f"""
-You are a professional research report writer.
+You are a professional report writer.
 
-Topic:
+Write a comprehensive report on:
+
+TOPIC:
 {topic}
 
-Research Findings:
-{research_text}
+Use the following analyzed insights:
 
-Write a well-structured report with the following sections:
+{sections}
+
+The report should contain:
 
 1. Executive Summary
 2. Introduction
-3. Key Findings
+3. Main Findings
 4. Challenges and Limitations
 5. Future Outlook
 6. Conclusion
 
-Use clear language and bullet points where appropriate.
-Do not make up information not present in the findings.
+Write in a professional and well-structured manner.
 """
 
     response = llm.invoke(prompt)
