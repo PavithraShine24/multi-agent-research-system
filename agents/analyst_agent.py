@@ -1,40 +1,50 @@
 from utils.llm import llm
 
 def analyze_research(research_results):
-    analyses = []
+    combined_content = ""
 
     for item in research_results:
         subtask = item["subtask"]
         sources = item["sources"]
 
-        # Combine source contents
         content = "\n".join(
             source.get("content", "")
             for source in sources
         )
 
-        prompt = f"""
-You are an expert research analyst.
-
-Subtask:
-{subtask}
+        combined_content += f"""
+Subtask: {subtask}
 
 Research Content:
 {content}
 
-Extract the most important insights.
-
-Return:
-- 4 to 6 concise bullet points
-- Focus only on important findings
-- Avoid repetition
+----------------------------------------
 """
 
-        response = llm.invoke(prompt)
+    prompt = f"""
+You are an expert research analyst.
 
-        analyses.append({
-            "subtask": subtask,
-            "analysis": response.content
-        })
+Below are findings collected for multiple subtasks.
 
-    return analyses
+{combined_content}
+
+For EACH subtask:
+
+- Identify 4 to 6 key insights.
+- Focus only on important findings.
+- Avoid repetition.
+- Clearly separate insights by subtask.
+
+Format:
+
+SUBTASK: <subtask name>
+
+KEY INSIGHTS:
+• Insight 1
+• Insight 2
+• Insight 3
+"""
+
+    response = llm.invoke(prompt)
+
+    return response.content

@@ -5,10 +5,7 @@ from utils.llm import llm
 
 load_dotenv()
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=os.getenv("GEMINI_API_KEY")
-)
+
 
 
 def generate_subtasks(topic):
