@@ -5,14 +5,28 @@ from agents.writer_agent import write_report
 from agents.fact_checker_agent import fact_check_report
 from agents.human_loop_agent import human_review
 from agents.revision_agent import revise_report
+from ieee_exporter import export_ieee
 
-topic = "Impact of AI in Healthcare"
+topic = input("Enter research topic: ")
 
 print("🧠 Generating subtasks...")
 subtasks = generate_subtasks(topic)
 
 print("\n🔍 Researching...")
 research = research_subtasks(subtasks)
+
+# Collect references
+references = []
+
+for item in research:
+    for source in item["sources"]:
+        title = source.get("title", "Untitled")
+        url = source.get("url", "")
+
+        if url:
+            references.append(f"{title}. Available: {url}")
+
+references = list(dict.fromkeys(references))
 
 
 print("\n📊 Analyzing...")
@@ -45,6 +59,9 @@ while True:
 
     if decision == "yes":
         final_report = report
+
+        export_ieee(topic, final_report, references)
+
         break
 
     print("\n📝 Revising report based on fact-check feedback...")
